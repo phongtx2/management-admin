@@ -14,35 +14,35 @@ import {
 import { UserOutlined, LockOutlined, UploadOutlined } from "@ant-design/icons";
 import { CategoriesSelector } from "../components/selectors/CategoriesSelector";
 import { useState, useMemo } from "react";
-import { addNewBook } from "../api/book";
+import { addNewProduct } from "../api/product";
 import { upLoadFile } from "../utils/uploadFile";
 import { deleteFile } from "../utils/deleteFile";
 import { generateUUID } from "../utils/uuid";
 import { getDownloadURL } from "firebase/storage";
 
-export const NewBook = () => {
+export const NewProduct = () => {
   const [form] = Form.useForm();
   const [coverImage, setCoverImage] = useState({
     fileList: [],
     url: "",
   });
   const [loading, setLoading] = useState(false);
-  const [book, setBook] = useState("");
+  const [product, setProduct] = useState("");
   const onFinish = async (values) => {
     try {
       setLoading(true);
-      await addNewBook({
+      await addNewProduct({
         ...values,
         categoryId: values.categories,
         image: coverImage.url,
-        downloadUrl: book,
+        downloadUrl: product,
       });
       form.resetFields();
       setCoverImage({
         fileList: [],
         url: "",
       });
-      setBook("");
+      setProduct("");
       notification.success({
         message: (
           <Typography.Title level={5} type="success">
@@ -51,7 +51,7 @@ export const NewBook = () => {
         ),
         description: (
           <Alert
-            message="Book added successfully"
+            message="Product added successfully"
             type="success"
             style={{ border: "none" }}
           />
@@ -139,7 +139,7 @@ export const NewBook = () => {
                   onChange={(e) => {
                     const uploadTask = upLoadFile(
                       e.fileList[0].originFileObj,
-                      `books/cover-image/${uuid}/${e.fileList[0].name}`
+                      `products/cover-image/${uuid}/${e.fileList[0].name}`
                     );
                     uploadTask.on(
                       "state_changed",
@@ -170,7 +170,7 @@ export const NewBook = () => {
                 style={{ marginBottom: "1rem" }}
                 onClick={async () => {
                   deleteFile(
-                    `books/cover-image/${uuid}/${coverImage.fileList[0].name}`
+                    `products/cover-image/${uuid}/${coverImage.fileList[0].name}`
                   );
                   setCoverImage({
                     fileList: [],
@@ -183,11 +183,11 @@ export const NewBook = () => {
           </Col>
           <Col span={14}>
             <Form.Item
-              name="book"
+              name="product"
               // rules={[
               //   {
               //     required: true,
-              //     message: "Please input your book!",
+              //     message: "Please input your product!",
               //   },
               // ]}
             >
@@ -195,8 +195,8 @@ export const NewBook = () => {
                 onChange={(e) => {
                   upLoadFile(
                     e.fileList[0].originFileObj,
-                    `books/content/${uuid}/${e.fileList[0].name}`
-                  ).then((url) => setBook(url));
+                    `products/content/${uuid}/${e.fileList[0].name}`
+                  ).then((url) => setProduct(url));
                 }}>
                 <Button icon={<UploadOutlined />}>Upload</Button>
               </Upload>
@@ -226,7 +226,7 @@ export const NewBook = () => {
                 htmlType="submit"
                 className="login-form-button"
                 loading={loading}>
-                Add new book
+                Add new product
               </Button>
             </Form.Item>
           </Col>

@@ -53,7 +53,7 @@ export const Login = () => {
   return (
     <>
       <Typography.Title style={{ marginTop: "5rem", textAlign: "center" }}>
-        Book Manament Login Page
+        Product Manament Login Page
       </Typography.Title>
       <Form
         name="normal_login"

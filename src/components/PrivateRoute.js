@@ -2,8 +2,8 @@ import { PrivateLayout } from "./PrivateLayout";
 import { Home } from "../pages/Home";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { DashboardFilled, BookOutlined, PlusOutlined } from "@ant-design/icons";
-import { NewBook } from "../pages/NewBook";
-import { EditBook } from "../pages/EditBook";
+import { NewProduct } from "../pages/NewProduct";
+import { EditProduct } from "../pages/EditProduct";
 
 export const PrivateRoute = () => {
   const routes = [
@@ -14,15 +14,15 @@ export const PrivateRoute = () => {
       icon: <BookOutlined />,
     },
     {
-      path: "/add-book",
-      name: "Add new book",
-      element: <NewBook />,
+      path: "/add-product",
+      name: "Add new product",
+      element: <NewProduct />,
       icon: <PlusOutlined />,
     },
     {
-      path: "/edit-book/:id",
-      name: "Edit book",
-      element: <EditBook />,
+      path: "/edit-product/:id",
+      name: "Edit product",
+      element: <EditProduct />,
       icon: <DashboardFilled />,
       hiddenSidebar: true,
     },

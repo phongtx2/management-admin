@@ -8,7 +8,7 @@ import {
   Alert,
 } from "antd";
 import { useEffect, useState } from "react";
-import { getBooks, deleteBook } from "../api/book";
+import { getProducts, deleteProduct } from "../api/product";
 import {
   DownloadOutlined,
   EditOutlined,
@@ -18,7 +18,7 @@ import { useNavigate } from "react-router-dom";
 
 export const Home = () => {
   const navigate = useNavigate();
-  const [books, setBooks] = useState([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -27,10 +27,10 @@ export const Home = () => {
     pageSize: 5,
     total: 0,
   });
-  const handleDeleteBook = async () => {
+  const handleDeleteProduct = async () => {
     try {
       setDeleteLoading(true);
-      await deleteBook(selectedItem.id);
+      await deleteProduct(selectedItem.id);
       notification.success({
         message: (
           <Typography.Title level={5} type="success">
@@ -39,7 +39,7 @@ export const Home = () => {
         ),
         description: (
           <Alert
-            message="Book deleted successfully"
+            message="Product deleted successfully"
             type="success"
             style={{ border: "none" }}
           />
@@ -58,7 +58,7 @@ export const Home = () => {
         ),
         description: (
           <Alert
-            message="Book deleted failed"
+            message="Product deleted failed"
             type="success"
             style={{ border: "none" }}
           />
@@ -76,7 +76,7 @@ export const Home = () => {
     {
       title: "Category",
       key: "category",
-      render: (book) => book?.Category.name,
+      render: (product) => product?.Category.name,
     },
     {
       title: "Description",
@@ -86,31 +86,38 @@ export const Home = () => {
     {
       title: "Cover Image",
       key: "coverImage",
-      render: (book) => {
+      render: (product) => {
         return (
-          <Image src={book.image} width={200} title="Preview" alt="preview" />
+          <Image
+            src={product.image}
+            width={200}
+            title="Preview"
+            alt="preview"
+          />
         );
       },
     },
     {
       title: "Action",
       key: "action",
-      render: (book) => {
+      render: (product) => {
         return (
           <div
             style={{
               display: "flex",
               flexDirection: "row",
               justifyContent: "space-evenly",
-            }}
-          >
-            <Button href={book.downloadUrl} type="primary">
+            }}>
+            <Button href={product.downloadUrl} type="primary">
               <DownloadOutlined />
             </Button>
-            <Button onClick={() => navigate(`/edit-book/${book.id}`)}>
+            <Button onClick={() => navigate(`/edit-product/${product.id}`)}>
               <EditOutlined />
             </Button>
-            <Button type="ghost" danger onClick={() => setSelectedItem(book)}>
+            <Button
+              type="ghost"
+              danger
+              onClick={() => setSelectedItem(product)}>
               <DeleteOutlined />
             </Button>
           </div>
@@ -120,13 +127,13 @@ export const Home = () => {
   ];
   useEffect(() => {
     (async () => {
-      const { data } = await getBooks(pagingState);
+      const { data } = await getProducts(pagingState);
       setPagingState((prev) => ({
         ...prev,
         total: data.total,
         currentPage: Number(data.currentPage),
       }));
-      setBooks(data.books);
+      setProducts(data.products);
       setLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -148,25 +155,27 @@ export const Home = () => {
             pageSize: pagination.pageSize,
           }));
         }}
-        dataSource={books}
+        dataSource={products}
         columns={columns}
         loading={loading}
       />
       {!!selectedItem && (
         <Modal
-          title="Delete book"
+          title="Delete product"
           visible={!!selectedItem}
           onCancel={() => setSelectedItem(null)}
           footer={
             <>
-              <Button danger onClick={handleDeleteBook} loading={deleteLoading}>
+              <Button
+                danger
+                onClick={handleDeleteProduct}
+                loading={deleteLoading}>
                 Delete
               </Button>
               <Button onClick={() => setSelectedItem(null)}>Cancel</Button>
             </>
-          }
-        >
-          <Typography>Do you want to delete this book ?</Typography>
+          }>
+          <Typography>Do you want to delete this product ?</Typography>
         </Modal>
       )}
     </>

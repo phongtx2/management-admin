@@ -15,13 +15,13 @@ import {
 import { UserOutlined, LockOutlined, UploadOutlined } from "@ant-design/icons";
 import { CategoriesSelector } from "../components/selectors/CategoriesSelector";
 import { useState, useMemo, useEffect } from "react";
-import { getBookById, updateBook } from "../api/book";
+import { getProductById, updateProduct } from "../api/product";
 import { upLoadFile } from "../utils/uploadFile";
 import { generateUUID } from "../utils/uuid";
 import { useParams, useNavigate } from "react-router-dom";
 import { getDownloadURL } from "firebase/storage";
 
-export const EditBook = () => {
+export const EditProduct = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [initEditValues, setInitEditValues] = useState({});
@@ -33,26 +33,26 @@ export const EditBook = () => {
   });
   const [loading, setLoading] = useState(false);
   const [initLoading, setInitLoading] = useState(true);
-  const [book, setBook] = useState("");
+  const [product, setProduct] = useState("");
   useEffect(() => {
     setInitLoading(true);
-    getBookById(id).then(({ data }) => {
+    getProductById(id).then(({ data }) => {
       setCoverImage((prev) => ({
         ...prev,
-        url: data.book.image,
+        url: data.product.image,
       }));
       setInitEditValues({
-        id: data.book.id,
-        name: data.book.name,
-        description: data.book.description,
-        categories: data.book.Category.id,
-        downloadUrl: data.book.downloadUrl,
+        id: data.product.id,
+        name: data.product.name,
+        description: data.product.description,
+        categories: data.product.Category.id,
+        downloadUrl: data.product.downloadUrl,
       });
       form.setFieldsValue({
-        id: data.book.id,
-        name: data.book.name,
-        description: data.book.description,
-        categories: data.book.Category.id,
+        id: data.product.id,
+        name: data.product.name,
+        description: data.product.description,
+        categories: data.product.Category.id,
       });
       setInitLoading(false);
     });
@@ -60,11 +60,11 @@ export const EditBook = () => {
   const onFinish = async (values) => {
     try {
       setLoading(true);
-      await updateBook(id, {
+      await updateProduct(id, {
         ...values,
         categoryId: values.categories,
         image: coverImage.url,
-        downloadUrl: book,
+        downloadUrl: product,
       });
 
       form.resetFields();
@@ -72,7 +72,7 @@ export const EditBook = () => {
         fileList: [],
         url: "",
       });
-      setBook("");
+      setProduct("");
       notification.success({
         message: (
           <Typography.Title level={5} type="success">
@@ -81,7 +81,7 @@ export const EditBook = () => {
         ),
         description: (
           <Alert
-            message="Book update successfully"
+            message="Product update successfully"
             type="success"
             style={{ border: "none" }}
           />
@@ -184,7 +184,7 @@ export const EditBook = () => {
                   onChange={(e) => {
                     const uploadTask = upLoadFile(
                       e.fileList[0].originFileObj,
-                      `books/cover-image/${uuid}/${e.fileList[0].name}`
+                      `products/cover-image/${uuid}/${e.fileList[0].name}`
                     );
                     uploadTask.on(
                       "state_changed",
@@ -225,11 +225,11 @@ export const EditBook = () => {
           </Col>
           <Col span={14}>
             <Form.Item
-              name="book"
+              name="product"
               // rules={[
               //   {
               //     required: true,
-              //     message: "Please input your book!",
+              //     message: "Please input your product!",
               //   },
               // ]}
             >
@@ -237,11 +237,11 @@ export const EditBook = () => {
                 onChange={(e) => {
                   upLoadFile(
                     e.fileList[0].originFileObj,
-                    `books/content/${uuid}/${e.fileList[0].name}`
-                  ).then((url) => setBook(url));
+                    `products/content/${uuid}/${e.fileList[0].name}`
+                  ).then((url) => setProduct(url));
                 }}
-                onRemove={() => setBook("")}>
-                {!book && <Button icon={<UploadOutlined />}>Upload</Button>}
+                onRemove={() => setProduct("")}>
+                {!product && <Button icon={<UploadOutlined />}>Upload</Button>}
               </Upload>
             </Form.Item>
           </Col>
@@ -269,7 +269,7 @@ export const EditBook = () => {
                 htmlType="submit"
                 className="login-form-button"
                 loading={loading}>
-                Add new book
+                Add new product
               </Button>
             </Form.Item>
           </Col>

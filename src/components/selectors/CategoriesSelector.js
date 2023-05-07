@@ -1,6 +1,6 @@
 import { Select } from "antd";
 import { useEffect, useState } from "react";
-import { getCategories } from "../../api/book";
+import { getCategories } from "../../api/product";
 
 export const CategoriesSelector = ({ name, onChange, value }) => {
   const [categories, setCategories] = useState([]);
@@ -21,8 +21,7 @@ export const CategoriesSelector = ({ name, onChange, value }) => {
       style={{ width: "100%" }}
       placeholder="Select a category"
       onChange={onChange}
-      value={value}
-    >
+      value={value}>
       {categories?.map((category) => (
         <Select.Option key={category.id} value={category.id}>
           {category.name}
