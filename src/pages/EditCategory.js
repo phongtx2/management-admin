@@ -10,39 +10,59 @@ import {
   notification,
   Upload,
   Image,
+  Spin,
 } from "antd";
-import { UserOutlined, LockOutlined } from "@ant-design/icons";
-import { CategoriesSelector } from "../components/selectors/CategoriesSelector";
-import { useState, useMemo } from "react";
-import { addNewProduct } from "../api/product";
+import { UserOutlined } from "@ant-design/icons";
+import { useState, useMemo, useEffect } from "react";
 import { upLoadFile } from "../utils/uploadFile";
-import { deleteFile } from "../utils/deleteFile";
 import { generateUUID } from "../utils/uuid";
+import { useParams, useNavigate } from "react-router-dom";
 import { getDownloadURL } from "firebase/storage";
+import { getCategoryById, updateCategory } from "../api/category";
 
-export const NewProduct = () => {
+export const EditCategory = () => {
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const [initEditValues, setInitEditValues] = useState({});
+
   const [form] = Form.useForm();
   const [coverImage, setCoverImage] = useState({
     fileList: [],
     url: "",
   });
   const [loading, setLoading] = useState(false);
-  const [product, setProduct] = useState("");
+  const [initLoading, setInitLoading] = useState(true);
+  useEffect(() => {
+    setInitLoading(true);
+    getCategoryById(id).then(({ data }) => {
+      setCoverImage((prev) => ({
+        ...prev,
+        url: data.category.image,
+      }));
+      setInitEditValues({
+        id: data.category.id,
+        name: data.category.name,
+      });
+      form.setFieldsValue({
+        id: data.category.id,
+        name: data.category.name,
+      });
+      setInitLoading(false);
+    });
+  }, [id, form]);
   const onFinish = async (values) => {
     try {
       setLoading(true);
-      await addNewProduct({
+      await updateCategory(id, {
         ...values,
-        categoryId: values.categories,
         image: coverImage.url,
-        downloadUrl: product,
       });
+
       form.resetFields();
       setCoverImage({
         fileList: [],
         url: "",
       });
-      setProduct("");
       notification.success({
         message: (
           <Typography.Title level={5} type="success">
@@ -51,7 +71,7 @@ export const NewProduct = () => {
         ),
         description: (
           <Alert
-            message="Product added successfully"
+            message="Category update successfully"
             type="success"
             style={{ border: "none" }}
           />
@@ -75,11 +95,25 @@ export const NewProduct = () => {
         duration: 5,
       });
     } finally {
+      navigate("/categories");
       setLoading(false);
     }
   };
 
   const uuid = useMemo(() => generateUUID(), []);
+
+  if (initLoading)
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100%",
+        }}>
+        <Spin />;
+      </div>
+    );
 
   return (
     <>
@@ -90,6 +124,7 @@ export const NewProduct = () => {
         initialValues={{
           remember: true,
           image: [],
+          ...initEditValues,
         }}
         onFinish={onFinish}
         layout="vertical"
@@ -101,28 +136,19 @@ export const NewProduct = () => {
               rules={[
                 {
                   required: true,
-                  message: "Please input Name!",
+                  message: "Please input your category name!",
                 },
               ]}>
               <Input
                 prefix={<UserOutlined className="site-form-item-icon" />}
-                placeholder="Name"
+                placeholder="name"
               />
             </Form.Item>
           </Col>
 
           <Col span={14}>
-            <Form.Item name="description">
-              <Input.TextArea
-                prefix={<LockOutlined className="site-form-item-icon" />}
-                type="text"
-                placeholder="Description"
-              />
-            </Form.Item>
-          </Col>
-          <Col span={14}>
             <Form.Item name="image">
-              {coverImage.fileList.length > 0 ? (
+              {coverImage.fileList.length > 0 || !!coverImage.url ? (
                 <Image src={coverImage?.url} alt="cover" />
               ) : (
                 <Upload
@@ -139,7 +165,7 @@ export const NewProduct = () => {
                   onChange={(e) => {
                     const uploadTask = upLoadFile(
                       e.fileList[0].originFileObj,
-                      `products/cover-image/${uuid}/${e.fileList[0].name}`
+                      `categories/cover-image/${uuid}/${e.fileList[0].name}`
                     );
                     uploadTask.on(
                       "state_changed",
@@ -160,18 +186,15 @@ export const NewProduct = () => {
                     );
                   }}>
                   {/* <UploadButton /> */}
-                  {!coverImage.fileList.length && "Upload"}
+                  {!coverImage.fileList.length && !coverImage.url && "Upload"}
                 </Upload>
               )}
             </Form.Item>
-            {coverImage.fileList.length > 0 && (
+            {(coverImage.fileList.length > 0 || !!coverImage.url) && (
               <Button
                 type="danger"
                 style={{ marginBottom: "1rem" }}
                 onClick={async () => {
-                  deleteFile(
-                    `products/cover-image/${uuid}/${coverImage.fileList[0].name}`
-                  );
                   setCoverImage({
                     fileList: [],
                     url: "",
@@ -181,42 +204,6 @@ export const NewProduct = () => {
               </Button>
             )}
           </Col>
-          {/* <Col span={14}>
-            <Form.Item
-              name="product"
-              // rules={[
-              //   {
-              //     required: true,
-              //     message: "Please input your product!",
-              //   },
-              // ]}
-            >
-              <Upload
-                onChange={(e) => {
-                  upLoadFile(
-                    e.fileList[0].originFileObj,
-                    `products/content/${uuid}/${e.fileList[0].name}`
-                  ).then((url) => setProduct(url));
-                }}>
-                <Button icon={<UploadOutlined />}>Upload</Button>
-              </Upload>
-            </Form.Item>
-          </Col> */}
-          <Col span={14}>
-            <Form.Item
-              name="categories"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your category!",
-                },
-              ]}>
-              <CategoriesSelector
-                name="categories"
-                onChange={(value) => form.setFieldsValue({ categories: value })}
-              />
-            </Form.Item>
-          </Col>
 
           <Col span={14}>
             <Form.Item>
@@ -225,7 +212,7 @@ export const NewProduct = () => {
                 htmlType="submit"
                 className="login-form-button"
                 loading={loading}>
-                Add new product
+                Update categories
               </Button>
             </Form.Item>
           </Col>

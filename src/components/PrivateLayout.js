@@ -4,7 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { LogoutOutlined } from "@ant-design/icons";
 const settings = {
   colorWeak: false,
-  title: "Product management admin",
+  title: "Admin management",
   headerHeight: 60,
   fixedHeader: true,
   fixSiderbar: true,

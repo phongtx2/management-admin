@@ -11,38 +11,33 @@ import {
   Upload,
   Image,
 } from "antd";
-import { UserOutlined, LockOutlined } from "@ant-design/icons";
-import { CategoriesSelector } from "../components/selectors/CategoriesSelector";
+import { UserOutlined } from "@ant-design/icons";
 import { useState, useMemo } from "react";
-import { addNewProduct } from "../api/product";
+import { addNewCategory } from "../api/category";
 import { upLoadFile } from "../utils/uploadFile";
 import { deleteFile } from "../utils/deleteFile";
 import { generateUUID } from "../utils/uuid";
 import { getDownloadURL } from "firebase/storage";
 
-export const NewProduct = () => {
+export const NewCategory = () => {
   const [form] = Form.useForm();
   const [coverImage, setCoverImage] = useState({
     fileList: [],
     url: "",
   });
   const [loading, setLoading] = useState(false);
-  const [product, setProduct] = useState("");
   const onFinish = async (values) => {
     try {
       setLoading(true);
-      await addNewProduct({
+      await addNewCategory({
         ...values,
-        categoryId: values.categories,
         image: coverImage.url,
-        downloadUrl: product,
       });
       form.resetFields();
       setCoverImage({
         fileList: [],
         url: "",
       });
-      setProduct("");
       notification.success({
         message: (
           <Typography.Title level={5} type="success">
@@ -51,7 +46,7 @@ export const NewProduct = () => {
         ),
         description: (
           <Alert
-            message="Product added successfully"
+            message="Category added successfully"
             type="success"
             style={{ border: "none" }}
           />
@@ -112,15 +107,6 @@ export const NewProduct = () => {
           </Col>
 
           <Col span={14}>
-            <Form.Item name="description">
-              <Input.TextArea
-                prefix={<LockOutlined className="site-form-item-icon" />}
-                type="text"
-                placeholder="Description"
-              />
-            </Form.Item>
-          </Col>
-          <Col span={14}>
             <Form.Item name="image">
               {coverImage.fileList.length > 0 ? (
                 <Image src={coverImage?.url} alt="cover" />
@@ -139,7 +125,7 @@ export const NewProduct = () => {
                   onChange={(e) => {
                     const uploadTask = upLoadFile(
                       e.fileList[0].originFileObj,
-                      `products/cover-image/${uuid}/${e.fileList[0].name}`
+                      `categories/cover-image/${uuid}/${e.fileList[0].name}`
                     );
                     uploadTask.on(
                       "state_changed",
@@ -170,7 +156,7 @@ export const NewProduct = () => {
                 style={{ marginBottom: "1rem" }}
                 onClick={async () => {
                   deleteFile(
-                    `products/cover-image/${uuid}/${coverImage.fileList[0].name}`
+                    `categories/cover-image/${uuid}/${coverImage.fileList[0].name}`
                   );
                   setCoverImage({
                     fileList: [],
@@ -181,42 +167,6 @@ export const NewProduct = () => {
               </Button>
             )}
           </Col>
-          {/* <Col span={14}>
-            <Form.Item
-              name="product"
-              // rules={[
-              //   {
-              //     required: true,
-              //     message: "Please input your product!",
-              //   },
-              // ]}
-            >
-              <Upload
-                onChange={(e) => {
-                  upLoadFile(
-                    e.fileList[0].originFileObj,
-                    `products/content/${uuid}/${e.fileList[0].name}`
-                  ).then((url) => setProduct(url));
-                }}>
-                <Button icon={<UploadOutlined />}>Upload</Button>
-              </Upload>
-            </Form.Item>
-          </Col> */}
-          <Col span={14}>
-            <Form.Item
-              name="categories"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your category!",
-                },
-              ]}>
-              <CategoriesSelector
-                name="categories"
-                onChange={(value) => form.setFieldsValue({ categories: value })}
-              />
-            </Form.Item>
-          </Col>
 
           <Col span={14}>
             <Form.Item>
@@ -225,7 +175,7 @@ export const NewProduct = () => {
                 htmlType="submit"
                 className="login-form-button"
                 loading={loading}>
-                Add new product
+                Add new categories
               </Button>
             </Form.Item>
           </Col>

@@ -8,13 +8,13 @@ import {
   Alert,
 } from "antd";
 import { useEffect, useState } from "react";
-import { getProducts, deleteProduct } from "../api/product";
+import { getCategory, deleteCategory } from "../api/category";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 
-export const Home = () => {
+export const Category = () => {
   const navigate = useNavigate();
-  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -23,10 +23,10 @@ export const Home = () => {
     pageSize: 5,
     total: 0,
   });
-  const handleDeleteProduct = async () => {
+  const handleDeleteCategory = async () => {
     try {
       setDeleteLoading(true);
-      await deleteProduct(selectedItem.id);
+      await deleteCategory(selectedItem.id);
       notification.success({
         message: (
           <Typography.Title level={5} type="success">
@@ -35,7 +35,7 @@ export const Home = () => {
         ),
         description: (
           <Alert
-            message="Product deleted successfully"
+            message="Category deleted successfully"
             type="success"
             style={{ border: "none" }}
           />
@@ -54,7 +54,7 @@ export const Home = () => {
         ),
         description: (
           <Alert
-            message="Product deleted failed"
+            message="Category deleted failed"
             type="success"
             style={{ border: "none" }}
           />
@@ -65,27 +65,22 @@ export const Home = () => {
   };
   const columns = [
     {
+      title: "Id",
+      dataIndex: "id",
+      key: "id",
+    },
+    {
       title: "Name",
       dataIndex: "name",
       key: "name",
     },
     {
-      title: "Category",
-      key: "category",
-      render: (product) => product?.Category.name,
-    },
-    {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
-    },
-    {
       title: "Cover Image",
       key: "coverImage",
-      render: (product) => {
+      render: (category) => {
         return (
           <Image
-            src={product.image}
+            src={category.image}
             width={200}
             title="Preview"
             alt="preview"
@@ -96,7 +91,7 @@ export const Home = () => {
     {
       title: "Action",
       key: "action",
-      render: (product) => {
+      render: (category) => {
         return (
           <div
             style={{
@@ -104,16 +99,13 @@ export const Home = () => {
               flexDirection: "row",
               justifyContent: "space-evenly",
             }}>
-            {/* <Button href={product.downloadUrl} type="primary">
-              <DownloadOutlined />
-            </Button> */}
-            <Button onClick={() => navigate(`/edit-product/${product.id}`)}>
+            <Button onClick={() => navigate(`/edit-category/${category.id}`)}>
               <EditOutlined />
             </Button>
             <Button
               type="ghost"
               danger
-              onClick={() => setSelectedItem(product)}>
+              onClick={() => setSelectedItem(category)}>
               <DeleteOutlined />
             </Button>
           </div>
@@ -123,13 +115,13 @@ export const Home = () => {
   ];
   useEffect(() => {
     (async () => {
-      const { data } = await getProducts(pagingState);
+      const { data } = await getCategory(pagingState);
       setPagingState((prev) => ({
         ...prev,
         total: data.total,
         currentPage: Number(data.currentPage),
       }));
-      setProducts(data.products);
+      setCategories(data.categories);
       setLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -151,27 +143,27 @@ export const Home = () => {
             pageSize: pagination.pageSize,
           }));
         }}
-        dataSource={products}
+        dataSource={categories}
         columns={columns}
         loading={loading}
       />
       {!!selectedItem && (
         <Modal
-          title="Delete product"
+          title="Delete category"
           visible={!!selectedItem}
           onCancel={() => setSelectedItem(null)}
           footer={
             <>
               <Button
                 danger
-                onClick={handleDeleteProduct}
+                onClick={handleDeleteCategory}
                 loading={deleteLoading}>
                 Delete
               </Button>
               <Button onClick={() => setSelectedItem(null)}>Cancel</Button>
             </>
           }>
-          <Typography>Do you want to delete this product ?</Typography>
+          <Typography>Do you want to delete this category ?</Typography>
         </Modal>
       )}
     </>

@@ -12,7 +12,7 @@ import {
   Image,
   Spin,
 } from "antd";
-import { UserOutlined, LockOutlined, UploadOutlined } from "@ant-design/icons";
+import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { CategoriesSelector } from "../components/selectors/CategoriesSelector";
 import { useState, useMemo, useEffect } from "react";
 import { getProductById, updateProduct } from "../api/product";
@@ -146,7 +146,7 @@ export const EditProduct = () => {
               rules={[
                 {
                   required: true,
-                  message: "Please input your Username!",
+                  message: "Please input your product name!",
                 },
               ]}>
               <Input
@@ -223,7 +223,7 @@ export const EditProduct = () => {
               </Button>
             )}
           </Col>
-          <Col span={14}>
+          {/* <Col span={14}>
             <Form.Item
               name="product"
               // rules={[
@@ -244,7 +244,7 @@ export const EditProduct = () => {
                 {!product && <Button icon={<UploadOutlined />}>Upload</Button>}
               </Upload>
             </Form.Item>
-          </Col>
+          </Col> */}
           <Col span={14}>
             <Form.Item
               name="categories"
@@ -269,7 +269,7 @@ export const EditProduct = () => {
                 htmlType="submit"
                 className="login-form-button"
                 loading={loading}>
-                Add new product
+                Update product
               </Button>
             </Form.Item>
           </Col>
